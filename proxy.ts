@@ -40,6 +40,11 @@ export async function proxy(request: NextRequest) {
 
   const { pathname } = request.nextUrl
 
+  // Rutas API protegidas sin sesión → 401 JSON
+  if (!user && pathname.startsWith('/api/')) {
+    return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
+  }
+
   // Si intenta acceder a ruta protegida sin sesión → redirige a /login
   if (!user && PROTECTED_ROUTES.some((route) => pathname.startsWith(route))) {
     const loginUrl = request.nextUrl.clone()
